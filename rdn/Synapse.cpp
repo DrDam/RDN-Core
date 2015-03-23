@@ -36,7 +36,7 @@ int Synapse::getCoef()   {return  coef ;  } //retourne le type de synapse
 
 //=> fonctionnement de la synapse
 void Synapse::run() {
-    if (signal==1&&neurone_aval->isActicf()==1)  // si la synapse transmet un message et que le neurone aval est actif
+    if (signal==1)
     {
          neurone_aval->PPS(type,coef); // générer un PPS
          signal = false ; // la synapse a fini sa transmission

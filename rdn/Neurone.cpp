@@ -13,7 +13,6 @@ Neurone::Neurone(int id) { // créer un neurone
     m_id=id;
     m_actif=0;
     m_potentiel = Neurone::m_seuil_bas ;
-
 }
 
 void Neurone::setstatic( int setseuil, int setbas, int settaux, int setpss) {
@@ -21,7 +20,7 @@ void Neurone::setstatic( int setseuil, int setbas, int settaux, int setpss) {
     Neurone::m_seuil_bas = setbas;
     Neurone::m_taux_stab = settaux ;
     Neurone::m_base_pps = setpss ;
-     }
+}
 
 
 //=> destructeur ( un neurone "disparait" s'il n'a plus de synapse amont ou aval => a spécifier clairement)
@@ -39,11 +38,11 @@ Neurone::~Neurone() {
 
 //=> PPS : ajoute un PPS au potentiel du neurone
 void Neurone::PPS( int type, int coef) {
-
-    float calc=(m_base_pps + type);
-    calc=calc/m_base_pps;
-    m_potentiel*=pow(calc,coef);
-
+    if(m_actif == true) { // si le neurone est actif, on fait évoluer le pps
+        float calc=(m_base_pps + type);
+        calc=calc/m_base_pps;
+        m_potentiel*=pow(calc,coef);
+    }
 }
 //=> exemple base_pps = 5 et type = +1 => self:potentiel = self:potentiel * 6/5
 
@@ -94,7 +93,7 @@ void Neurone::detruire_synapse(Synapse* synapse_cible , bool amont ) {
 //=> fonctionnement normal du neurone
 void Neurone::run() {
     stabilise() ; // abaise le potentiel
-    if (m_potentiel>m_seuil&&m_actif==1)// si le potentiel est toujours supérieur au seuil et le neurone est "actif"
+    if (m_potentiel>m_seuil && m_actif==1)// si le potentiel est toujours supérieur au seuil et le neurone est "actif"
         {
       #pragma omp parallel for
 	  for( unsigned int i=0;i<T_aval.size();i++){ // on transmet le PA à toutes les synapses avals
@@ -105,8 +104,8 @@ void Neurone::run() {
 
 }
 
-bool Neurone::isActicf() { return m_actif; } // renseigne sur l'état du neurone
 float Neurone::getpotentiel() { return m_potentiel; } // renvoi le potentiel du neurone
+
 int Neurone::getId(){ return m_id;}
 
 std::vector<Synapse*> Neurone::getAllAmont()

@@ -12,11 +12,17 @@ class Reseau {
     std::vector<Synapse*> T_Synapses ;// tableau qui contient les synapses du réseau
     bool end ; // signal de FIN
 
+
     public:
     std::vector<Synapse*> T_Input ;// tableau qui contient les synapses d'entrées du réseau
     std::vector<Synapse*> T_Output ;// tableau qui contient les synapses de sorties du réseau
 
     //méthodes
+    protected:
+    void createNeurones( int nb_Neurone);
+    int createSynapses(int nb_Neurone, int nb_Synapse);
+
+
     public:
     Reseau( char URL );
     Reseau( int nb_Neurone, int nb_Synapse, int nb_Input, int nb_Output ) ;

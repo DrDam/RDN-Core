@@ -31,7 +31,6 @@ class Neurone {
     void ajout_synapse(Synapse* synapse ,bool amont = true); // ajoute une synapse au neurone
     void detruire_synapse(Synapse* synapse_cible , bool amont = true); // détruit une synapse
     void run(); // fonctionnement du neurone
-    bool isActicf(); // renvoi l'état du neurone
     static void setstatic( int setseuil, int setbas, int settaux, int setpss) ; // met à jour les static au début du programme
     float getpotentiel() ; // renvoi la valeur du potentiel
     int getId();
