@@ -7,7 +7,7 @@
 class Reseau {
 
     //attributs
-    private:
+    protected:
     std::vector<Neurone*> T_Neurones ;// tableau qui contient les neurones du réseau
     std::vector<Synapse*> T_Synapses ;// tableau qui contient les synapses du réseau
     bool end ; // signal de FIN
@@ -19,13 +19,14 @@ class Reseau {
 
     //méthodes
     protected:
-    void createNeurones( int nb_Neurone);
+    void createNeurones( int nb_Neurone, int alea_seed);
     int createSynapses(int nb_Neurone, int nb_Synapse);
 
 
     public:
     Reseau( char URL );
     Reseau( int nb_Neurone, int nb_Synapse, int nb_Input, int nb_Output ) ;
+    Reseau( int nb_Neurone, int nb_Synapse, int nb_Input, int nb_Output, int alea_seed );
     void integration(); // => transmet au réseau l'état des synapses d'entré
     void run() ;
 

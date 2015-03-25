@@ -13,17 +13,19 @@ class Neurone {
     static int m_seuil_bas;
     static int m_taux_stab;
     static int m_base_pps;
-    bool m_actif ;           // le neurone est il actif
+    bool m_actif ;
+    int m_x_coord;
+    int m_y_coord;
+    int m_z_coord;           // le neurone est il actif
     std::vector<Synapse*> T_amont ;// tableau qui contient les synapses amont
     std::vector<Synapse*> T_aval ;// tableau qui contient les synapses aval
     float m_potentiel; // valeur du potentiel
-
     int m_id; // ID du neurone
 
     //méthodes
 
     public:
-
+    Neurone(int id, int x, int y, int z);
     Neurone(int id); // constructeur
     ~Neurone();
     void PPS( int type,int coef); // le neurone reçoit un signal d'une synapse
@@ -33,6 +35,11 @@ class Neurone {
     void run(); // fonctionnement du neurone
     static void setstatic( int setseuil, int setbas, int settaux, int setpss) ; // met à jour les static au début du programme
     float getpotentiel() ; // renvoi la valeur du potentiel
+    float getSeuill() ;
+    int get_x_coord();
+    int get_y_coord();
+    int get_z_coord();
+    bool is_active();
     int getId();
 
     std::vector<Synapse*> getAllAmont();

@@ -3,16 +3,15 @@
 #include <vector>
 #include "math.h"
 
+int Neurone::m_seuil = 100; // prametre du programme => static/global ?
+int Neurone::m_seuil_bas = 10; // prametre du programme => static/global ?
+int Neurone::m_taux_stab = 10;  // % prametre du programme => static/global ?
+int Neurone::m_base_pps = 5 ;  //% prametre du programme => static/global ?
 
- int Neurone::m_seuil = 100; // prametre du programme => static/global ?
- int Neurone::m_seuil_bas = 10; // prametre du programme => static/global ?
- int Neurone::m_taux_stab = 10;  // % prametre du programme => static/global ?
- int Neurone::m_base_pps = 5 ;  //% prametre du programme => static/global ?
+Neurone::Neurone(int id) : m_id(id), m_actif(0), m_potentiel(Neurone::m_seuil_bas){ // cr√©er un neurone
 
-Neurone::Neurone(int id) { // crÈer un neurone
-    m_id=id;
-    m_actif=0;
-    m_potentiel = Neurone::m_seuil_bas ;
+}
+Neurone::Neurone(int id, int x, int y, int z) : m_id(id), m_actif(0), m_potentiel(Neurone::m_seuil_bas), m_x_coord(x), m_y_coord(y), m_z_coord(z) {
 }
 
 void Neurone::setstatic( int setseuil, int setbas, int settaux, int setpss) {
@@ -23,22 +22,22 @@ void Neurone::setstatic( int setseuil, int setbas, int settaux, int setpss) {
 }
 
 
-//=> destructeur ( un neurone "disparait" s'il n'a plus de synapse amont ou aval => a spÈcifier clairement)
-    //=> dÈtruit les synapses restantes
+//=> destructeur ( un neurone "disparait" s'il n'a plus de synapse amont ou aval => a sp√©cifier clairement)
+    //=> d√©truit les synapses restantes
 Neurone::~Neurone() {
     #pragma omp parallel for
     for( unsigned int i=0;i<T_amont.size();++i){ // pour toutes les synapses Amont
-		 T_amont[i]->detruit( false ) ; // on les dÈtruit en prÈcisant que l'ordre vient du neurone "aval"
+		 T_amont[i]->detruit( false ) ; // on les d√©truit en pr√©cisant que l'ordre vient du neurone "aval"
 		}
     #pragma omp parallel for
 	for( unsigned int i=0;i<T_aval.size();++i){ // pour toutes les synapses aval
-		 T_aval[i]->detruit( true ) ;// on les dÈtruit en prÈcisant que l'ordre vient du neurone "amont"
+		 T_aval[i]->detruit( true ) ;// on les d√©truit en pr√©cisant que l'ordre vient du neurone "amont"
 		} }
 
 
 //=> PPS : ajoute un PPS au potentiel du neurone
 void Neurone::PPS( int type, int coef) {
-    if(m_actif == true) { // si le neurone est actif, on fait Èvoluer le pps
+    if(m_actif == true) { // si le neurone est actif, on fait √©voluer le pps
         float calc=(m_base_pps + type);
         calc=calc/m_base_pps;
         m_potentiel*=pow(calc,coef);
@@ -49,7 +48,7 @@ void Neurone::PPS( int type, int coef) {
 
 //=>Stabilise : permet au neurone de retrouver sont potentiel de base
 void Neurone::stabilise() {
-if(m_potentiel<=m_seuil_bas)  // si le potentiel est infÈrieur au potentiel de base => i.e. le neurone est reposÈ
+if(m_potentiel<=m_seuil_bas)  // si le potentiel est inf√©rieur au potentiel de base => i.e. le neurone est repos√©
     {
     m_actif = true; // le neurone redevient actif
     m_potentiel = m_seuil_bas; // on bloque le potentiel au seuil bas
@@ -65,7 +64,7 @@ if(m_potentiel<=m_seuil_bas)  // si le potentiel est infÈrieur au potentiel de b
 //=> exemple taux_stab = 4/5 => self:potentiel = self:potentiel * 4/5
 
 
-//=> ajoute une synapse ‡ un neurone
+//=> ajoute une synapse √† un neurone
 void Neurone::ajout_synapse(Synapse* synapse , bool synapse_amont) {
     //std::cout << "ajout synapse" << std::endl;
     if ( synapse_amont == true ) { T_amont.push_back( synapse ); }
@@ -74,17 +73,17 @@ void Neurone::ajout_synapse(Synapse* synapse , bool synapse_amont) {
 
 
 
-//=> dÈtruit une rÈfÈrence ‡ une synapse
+//=> d√©truit une r√©f√©rence √† une synapse
 void Neurone::detruire_synapse(Synapse* synapse_cible , bool amont ) {
     /*
     Si amont = VRAI
         Alors cible = self:Synapses_amont
         Sinon cible = self:Synapses_aval
     FinSi
-    Pour chaque rÈfÈrence_synapse dans cible
+    Pour chaque r√©f√©rence_synapse dans cible
         faire
-            Si rÈfÈrence_synapse = synapse_cible
-                Alors rÈfÈrence_synapse = null
+            Si r√©f√©rence_synapse = synapse_cible
+                Alors r√©f√©rence_synapse = null
             FinSi
     FinPour
     */
@@ -93,26 +92,42 @@ void Neurone::detruire_synapse(Synapse* synapse_cible , bool amont ) {
 //=> fonctionnement normal du neurone
 void Neurone::run() {
     stabilise() ; // abaise le potentiel
-    if (m_potentiel>m_seuil && m_actif==1)// si le potentiel est toujours supÈrieur au seuil et le neurone est "actif"
+    if (m_potentiel>m_seuil && m_actif==1)// si le potentiel est toujours sup√©rieur au seuil et le neurone est "actif"
         {
       #pragma omp parallel for
-	  for( unsigned int i=0;i<T_aval.size();i++){ // on transmet le PA ‡ toutes les synapses avals
+	  for( unsigned int i=0;i<T_aval.size();i++){ // on transmet le PA √† toutes les synapses avals
             T_aval[i]->transmet(1) ;
             }
-        m_actif = false; // le neurone rentre en phase rÈfractaire
+        m_actif = false; // le neurone rentre en phase r√©fractaire
         }
 
 }
 
-float Neurone::getpotentiel() { return m_potentiel; } // renvoi le potentiel du neurone
+ // renvoi le potentiel du neurone
+float Neurone::getpotentiel()
+{
+    return m_potentiel;
+}
 
+// Renvoi l'id du Neurone
 int Neurone::getId(){ return m_id;}
 
+int Neurone::get_x_coord(){ return m_x_coord;}
+int Neurone::get_y_coord(){ return m_y_coord;}
+int Neurone::get_z_coord(){ return m_z_coord;}
+
+
+
+// Le neuron est-il actif
+bool Neurone::is_active(){ return m_actif;}
+
+// Retourne toutes les synapses amont
 std::vector<Synapse*> Neurone::getAllAmont()
  {
     return T_amont;
  }
 
+// Retourne toutes les synapses avals
 std::vector<Synapse*> Neurone::getAllAval()
  {
     return T_aval;

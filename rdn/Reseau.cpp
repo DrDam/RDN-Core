@@ -9,12 +9,16 @@
 
 
 Reseau::Reseau( char URL ) { }
+Reseau::Reseau( int nb_Neurone, int nb_Synapse, int nb_Input, int nb_Output) {
+
+    Reseau( nb_Neurone, nb_Synapse, nb_Input, nb_Output, 10 );
+}
 
 //=> création du réseau : nb_synapse : nombre de synapse aval par neurone
-Reseau::Reseau( int nb_Neurone, int nb_Synapse, int nb_Input, int nb_Output ) {
+Reseau::Reseau( int nb_Neurone, int nb_Synapse, int nb_Input, int nb_Output, int alea_seed ) {
     int syncrees;
 
-    Reseau::createNeurones(nb_Neurone);
+    Reseau::createNeurones(nb_Neurone, alea_seed);
 
     syncrees = Reseau::createSynapses(nb_Neurone, nb_Synapse);
 
@@ -33,10 +37,10 @@ Reseau::Reseau( int nb_Neurone, int nb_Synapse, int nb_Input, int nb_Output ) {
     }
  }
 
-void Reseau::createNeurones(int nb_Neurone) {
+void Reseau::createNeurones(int nb_Neurone, int alea_seed) {
    // création des neurone
     for ( int i = 0;i<nb_Neurone;++i) {
-            T_Neurones.push_back( new Neurone(i) );
+            T_Neurones.push_back( new Neurone(i, alea(alea_seed), alea(alea_seed), alea(alea_seed) ) );
     }
 }
 
